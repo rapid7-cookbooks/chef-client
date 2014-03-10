@@ -70,12 +70,14 @@ module Opscode
         end
       end
 
-      def create_directories
+      def create_directories(recipe=nil)
+        recipe = caller.first unless recipe
         # dir_owner and dir_group are not found in the block below.
         d_owner = dir_owner
         d_group = dir_group
         %w{run_path cache_path backup_path log_dir conf_dir}.each do |dir|
-          directory node['chef_client'][dir] do
+          directory "#{recipe}: #{node['chef_client'][dir]}" do
+            path node['chef_client'][dir]
             recursive true
             mode 00750 if dir == 'log_dir'
             owner d_owner
